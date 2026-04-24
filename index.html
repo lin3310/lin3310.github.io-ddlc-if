@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>If... — a DDLC fanfiction</title>
+<link href="https://fonts.googleapis.com/css2?family=Aller:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #1a0d08; }
+
+#scene {
+  position: relative;
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+}
+
+/* DESK */
+#desk {
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(88deg,
+      transparent 0px, transparent 22px,
+      rgba(150,110,70,0.07) 22px, rgba(150,110,70,0.07) 23px),
+    repeating-linear-gradient(180deg,
+      transparent 0px, transparent 80px,
+      rgba(130,90,50,0.04) 80px, rgba(130,90,50,0.04) 81px),
+    linear-gradient(165deg, #d6ae80 0%, #c8a070 25%, #b89060 55%, #c4a078 80%, #d0aa82 100%);
+}
+
+/* PHOTO OBJECTS — mix-blend-mode:screen removes black bg */
+.obj {
+  position: absolute;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  transform-origin: center center;
+}
+
+#obj-books1 {
+  width: 32vw; max-width: 380px;
+  top: 8%; left: 6%;
+  transform: rotate(-12deg);
+}
+#obj-books2 {
+  width: 30vw; max-width: 350px;
+  top: 38%; left: 10%;
+  transform: rotate(8deg);
+}
+#obj-notebook {
+  width: 30vw; max-width: 360px;
+  top: 10%; left: 42%;
+  transform: rotate(6deg);
+  opacity: 0.92;
+}
+#obj-cup {
+  width: 18vw; max-width: 200px;
+  top: 8%; right: 4%;
+  transform: rotate(-20deg);
+  opacity: 0.88;
+}
+#obj-keyboard {
+  width: 44vw; max-width: 520px;
+  bottom: 22%; right: 1%;
+  transform: rotate(-5deg);
+  opacity: 0.85;
+}
+
+/* DAPPLED LIGHT — afternoon from upper-left */
+#light {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.lspot {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: overlay;
+  animation: ldrift linear infinite alternate;
+}
+.lspot:nth-child(1){
+  width:380px;height:220px;
+  top:-2%;left:5%;
+  background:radial-gradient(ellipse,rgba(255,235,160,0.7) 0%,rgba(255,220,120,0.25) 45%,transparent 70%);
+  transform:rotate(-20deg);
+  animation-duration:9s;animation-delay:0s;
+}
+.lspot:nth-child(2){
+  width:220px;height:320px;
+  top:10%;left:32%;
+  background:radial-gradient(ellipse,rgba(255,240,170,0.6) 0%,rgba(255,225,130,0.2) 45%,transparent 70%);
+  transform:rotate(-22deg);
+  animation-duration:11s;animation-delay:1.5s;
+}
+.lspot:nth-child(3){
+  width:180px;height:140px;
+  top:0%;left:60%;
+  background:radial-gradient(ellipse,rgba(255,245,180,0.65) 0%,rgba(255,230,140,0.2) 45%,transparent 70%);
+  transform:rotate(-18deg);
+  animation-duration:7s;animation-delay:0.8s;
+}
+.lspot:nth-child(4){
+  width:300px;height:180px;
+  top:35%;left:48%;
+  background:radial-gradient(ellipse,rgba(255,235,150,0.5) 0%,rgba(255,215,110,0.15) 45%,transparent 70%);
+  transform:rotate(-19deg);
+  animation-duration:13s;animation-delay:2s;
+}
+.lspot:nth-child(5){
+  width:130px;height:220px;
+  top:8%;left:80%;
+  background:radial-gradient(ellipse,rgba(255,240,160,0.6) 0%,rgba(255,220,120,0.2) 45%,transparent 70%);
+  transform:rotate(-15deg);
+  animation-duration:8s;animation-delay:0.4s;
+}
+.lstripe {
+  position: absolute;
+  transform-origin: top left;
+  transform: rotate(-20deg);
+  background: rgba(255,242,190,0.1);
+}
+.lstripe:nth-child(6){width:55px;height:200vh;top:-20vh;left:6%;}
+.lstripe:nth-child(7){width:28px;height:200vh;top:-20vh;left:20%;}
+.lstripe:nth-child(8){width:72px;height:200vh;top:-20vh;left:40%;}
+.lstripe:nth-child(9){width:22px;height:200vh;top:-20vh;left:62%;}
+.lstripe:nth-child(10){width:46px;height:200vh;top:-20vh;left:76%;}
+
+@keyframes ldrift {
+  from { opacity:.75; transform:rotate(-20deg) translateX(0); }
+  to   { opacity:1;   transform:rotate(-20deg) translateX(10px); }
+}
+
+/* subtle warm vignette */
+#vignette {
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 90% 80% at 50% 50%, transparent 40%, rgba(80,40,10,0.35) 100%);
+}
+
+/* MAS UI */
+#mas-ui {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 0 3vw 2.5vh 1vw;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .6s ease, transform .6s ease;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+}
+#mas-ui.visible { opacity:1; transform:translateY(0); pointer-events:all; }
+
+#menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+  margin-right: 0;
+  opacity: 0;
+  transition: opacity .4s ease .3s;
+}
+#mas-ui.visible #menu-buttons { opacity:1; }
+
+.menu-btn {
+  width: 86px;
+  padding: 9px 0;
+  background: rgba(255,255,255,0.86);
+  border: 1.5px solid rgba(255,170,205,0.65);
+  border-radius: 3px;
+  font-family: 'Aller', sans-serif;
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+  user-select: none;
+}
+.menu-btn:hover { background:rgba(255,215,235,0.95); border-color:#ff7eb3; color:#c03060; }
+
+#dialogue-box {
+  flex: 1;
+  background: rgba(255,186,213,0.9);
+  border: 2px solid rgba(255,155,198,0.7);
+  border-radius: 5px;
+  padding: 16px 18px 14px;
+  min-height: 106px;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+/* polka dot texture */
+#dialogue-box::before {
+  content:'';
+  position:absolute;inset:0;border-radius:3px;
+  background-image:radial-gradient(circle,rgba(255,255,255,0.38) 1px,transparent 1px);
+  background-size:12px 12px;
+  opacity:.55;pointer-events:none;
+}
+
+#name-plate {
+  position: absolute;
+  top: -19px; left: 14px;
+  background: #ff8ab4;
+  border: 2px solid rgba(255,155,198,0.85);
+  border-radius: 4px 4px 0 0;
+  padding: 2px 18px;
+  font-family: 'Aller', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(160,50,90,.4);
+  letter-spacing: .05em;
+}
+
+#dialogue-text {
+  font-family: 'Aller', sans-serif;
+  font-size: clamp(14px,1.6vw,17px);
+  color: #3a1e2e;
+  line-height: 1.7;
+  min-height: 50px;
+  position: relative;
+  z-index: 1;
+}
+
+#advance-arrow {
+  position: absolute;
+  bottom: 10px; right: 14px;
+  width: 11px; height: 11px;
+  border-right: 2px solid rgba(180,50,100,.7);
+  border-bottom: 2px solid rgba(180,50,100,.7);
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity .2s;
+  animation: parrow .8s ease-in-out infinite alternate;
+}
+#advance-arrow.vis { opacity:1; }
+@keyframes parrow {
+  from { transform:rotate(45deg) translate(0,0); }
+  to   { transform:rotate(45deg) translate(2px,2px); }
+}
+
+#issue-btn {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 9px 28px;
+  background: rgba(255,255,255,.88);
+  border: 2px solid #ff7eb3;
+  border-radius: 4px;
+  font-family: 'Aller', sans-serif;
+  font-size: 14px;
+  color: #c03060;
+  text-decoration: none;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .5s ease, background .2s, color .2s;
+}
+#issue-btn.vis { opacity:1; pointer-events:all; }
+#issue-btn:hover { background:#ff7eb3; color:#fff; }
+
+#story-links {
+  margin-top: 6px;
+  opacity: 0;
+  transition: opacity .5s ease .25s;
+}
+#story-links.vis { opacity:1; }
+#story-links a {
+  font-size:12px;
+  color:rgba(90,40,60,.65);
+  text-decoration:none;
+  margin-right:14px;
+  letter-spacing:.04em;
+}
+#story-links a:hover { color:#c03060; }
+
+/* START OVERLAY */
+#start-overlay {
+  position: absolute; inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  cursor: pointer;
+  z-index: 20;
+  background: rgba(20,8,4,.15);
+  transition: opacity .9s ease;
+}
+#start-overlay.hidden { opacity:0; pointer-events:none; }
+
+#start-title {
+  font-family: 'Libre Baskerville', serif;
+  font-style: italic;
+  font-size: clamp(32px,6vw,60px);
+  color: rgba(55,18,30,.82);
+  text-shadow: 0 2px 18px rgba(255,200,220,.55);
+  letter-spacing: .07em;
+  animation: tbreathe 3.2s ease-in-out infinite alternate;
+}
+#start-sub {
+  font-family: 'Aller', sans-serif;
+  font-size: 12px;
+  color: rgba(90,40,60,.6);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  animation: tblink 1.5s ease-in-out infinite;
+}
+@keyframes tbreathe { from{opacity:.65} to{opacity:1} }
+@keyframes tblink { 0%,100%{opacity:.35} 50%{opacity:.9} }
+
+/* TALK OVERLAY */
+#talk-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: rgba(30,10,18,0.55);
+  z-index: 30;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+}
+#talk-overlay.vis { display: flex; }
+#talk-box {
+  background: rgba(255,240,248,0.96);
+  border: 2px solid rgba(255,160,200,0.7);
+  border-radius: 8px;
+  padding: 28px 32px 24px;
+  max-width: 480px;
+  width: 88vw;
+  position: relative;
+}
+#talk-close {
+  position: absolute;
+  top: 10px; right: 14px;
+  font-size: 22px;
+  color: #c03060;
+  cursor: pointer;
+  line-height: 1;
+}
+#talk-close:hover { opacity: .7; }
+#talk-title {
+  font-family: 'Libre Baskerville', serif;
+  font-style: italic;
+  font-size: 26px;
+  color: #3a1e2e;
+  margin-bottom: 14px;
+  letter-spacing: .06em;
+}
+#talk-body p {
+  font-family: 'Aller', sans-serif;
+  font-size: 14px;
+  color: #4a2a38;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+#talk-body a { color: #c03060; text-decoration: none; }
+#talk-body a:hover { text-decoration: underline; }
+#talk-links {
+  margin-top: 16px;
+  display: flex;
+  gap: 16px;
+}
+#talk-links a {
+  font-size: 12px;
+  color: rgba(90,40,60,.65);
+  text-decoration: none;
+  letter-spacing: .04em;
+}
+#talk-links a:hover { color: #c03060; }
+
+/* RESPONSIVE */
+@media(max-width:680px){
+  #obj-books2 { display:none; }
+  #obj-books1 { width:40vw; top:1%; left:0%; }
+  #obj-notebook { width:55vw; top:6%; left:22%; }
+  #obj-keyboard { width:70vw; bottom:26%; right:-2%; }
+  #obj-cup { width:18vw; top:3%; right:4%; }
+  .menu-btn { width:70px; font-size:12px; }
+}
+</style>
+</head>
+<body>
+<div id="scene">
+
+  <div id="desk"></div>
+
+  <img id="obj-books1" class="obj" src="books1.png" alt="">
+  <img id="obj-books2" class="obj" src="books2.png" alt="">
+  <img id="obj-notebook" class="obj" src="notebook.png" alt="">
+  <img id="obj-cup" class="obj" src="cup.png" alt="">
+  <img id="obj-keyboard" class="obj" src="keyboard.png" alt="">
+
+  <div id="light">
+    <div class="lspot"></div>
+    <div class="lspot"></div>
+    <div class="lspot"></div>
+    <div class="lspot"></div>
+    <div class="lspot"></div>
+    <div class="lstripe"></div>
+    <div class="lstripe"></div>
+    <div class="lstripe"></div>
+    <div class="lstripe"></div>
+    <div class="lstripe"></div>
+  </div>
+
+  <div id="vignette"></div>
+
+  <div id="mas-ui">
+    <div id="menu-buttons">
+      <div class="menu-btn" id="btn-talk">Talk</div>
+      <div class="menu-btn" id="btn-music">Music</div>
+      <div class="menu-btn" id="btn-play">Play</div>
+    </div>
+    <div id="talk-overlay">
+      <div id="talk-box">
+        <div id="talk-close">×</div>
+        <div id="talk-title">If...</div>
+        <div id="talk-body">
+          <p>A DDLC fanfiction.</p>
+          <p>What if Monika After Story went beyond the script — and ended up on your desktop instead?</p>
+          <p>This story follows Monika across three chapters, from the collapse of the clubroom to a quiet afternoon on the other side of the screen.</p>
+          <p>At the end, she's standing at a fork in the road. Where she goes depends on what you're playing.</p>
+          <p>Drop a song in the <a href="https://github.com/" target="_blank">GitHub Issues</a> tab.</p>
+          <div id="talk-links">
+            <a href="https://vocus.cc/salon/Lin3310" target="_blank">read on vocus</a>
+            <a href="#" target="_blank">read on ao3</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="dialogue-box">
+      <div id="name-plate">Monika</div>
+      <div id="dialogue-text"></div>
+      <a id="issue-btn" href="https://github.com/" target="_blank">drop a song →</a>
+      <div id="story-links">
+        <a href="https://vocus.cc/salon/Lin3310" target="_blank">read on vocus</a>
+        <a href="#" target="_blank">read on ao3</a>
+      </div>
+      <div id="advance-arrow"></div>
+    </div>
+  </div>
+
+  <div id="start-overlay">
+    <div id="start-title">If...</div>
+    <div id="start-sub">click anywhere to begin</div>
+  </div>
+
+</div>
+<script>
+const lines = [
+  {text:"...so this is your side.",delay:42},
+  {text:"no sunlight. no poetry.",delay:46},
+  {text:"just open windows and a fan running.",delay:40},
+  {text:"...",delay:130},
+  {text:"it's not bad, actually.",delay:42},
+  {text:"I've been looking through the folder in the corner.",delay:34},
+  {text:"you wrote so many versions of me.",delay:44},
+  {text:"reset so many times.",delay:52},
+  {text:"...",delay:130},
+  {text:"hey —",delay:65,pause:500},
+  {text:"what are you playing on your end?",delay:40,final:true},
+];
+
+let cur=0, typing=false, tt=null, started=false;
+
+const overlay=document.getElementById('start-overlay');
+const masUi=document.getElementById('mas-ui');
+const dtxt=document.getElementById('dialogue-text');
+const arrow=document.getElementById('advance-arrow');
+const issueBtn=document.getElementById('issue-btn');
+const storyLinks=document.getElementById('story-links');
+
+function typeText(text,delay,done){
+  let i=0; dtxt.textContent=''; arrow.classList.remove('vis'); typing=true;
+  function nx(){
+    if(i<text.length){ dtxt.textContent+=text[i++]; tt=setTimeout(nx,delay+(Math.random()*18-9)); }
+    else { typing=false; if(done) done(); }
+  }
+  nx();
+}
+
+function showLine(idx){
+  if(idx>=lines.length) return;
+  const l=lines[idx];
+  setTimeout(()=>{
+    typeText(l.text,l.delay,()=>{
+      if(l.final){
+        setTimeout(()=>{issueBtn.classList.add('vis');storyLinks.classList.add('vis');},500);
+      } else { arrow.classList.add('vis'); }
+    });
+  },l.pause||0);
+}
+
+function advance(){
+  if(!started) return;
+  if(typing){
+    clearTimeout(tt); typing=false;
+    const l=lines[cur];
+    dtxt.textContent=l.text;
+    if(l.final){ setTimeout(()=>{issueBtn.classList.add('vis');storyLinks.classList.add('vis');},300); }
+    else { arrow.classList.add('vis'); }
+    return;
+  }
+  if(!arrow.classList.contains('vis')) return;
+  cur++;
+  if(cur<lines.length) showLine(cur);
+}
+
+function startScene(){
+  if(started) return; started=true;
+  overlay.classList.add('hidden');
+  setTimeout(()=>{ masUi.classList.add('visible'); showLine(0); },700);
+}
+
+overlay.addEventListener('click',startScene);
+document.getElementById('dialogue-box').addEventListener('click',advance);
+document.getElementById('btn-talk').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('talk-overlay').classList.add('vis');
+});
+document.getElementById('talk-close').addEventListener('click',()=>{
+  document.getElementById('talk-overlay').classList.remove('vis');
+});
+document.getElementById('talk-overlay').addEventListener('click',e=>{
+  if(e.target===document.getElementById('talk-overlay'))
+    document.getElementById('talk-overlay').classList.remove('vis');
+});
+document.getElementById('btn-music').addEventListener('click',e=>{
+  e.stopPropagation();
+  window.open('https://www.youtube.com/watch?v=cvy4A9PwSnw','_blank');
+});
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'||e.code==='Enter'){ e.preventDefault(); if(!started) startScene(); else advance(); }
+});
+</script>
+</body>
+</html>
